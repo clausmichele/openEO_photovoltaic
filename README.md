@@ -8,6 +8,14 @@ The following notebook "photovoltaic.ipynb" explians how PV farms have been extr
     
 ![photovoltaic_osm](https://github.com/masawdah/openEO_photovoltaic/assets/61426508/a466c81c-1f1b-4a76-b530-7a02ab817b65)
 
+## Data 
+- Global PV Inventory:
+  - Training:  25105 polygons from 2017 "trn_polygons.json". 
+  - Test: 2082 polygons from 2018 "test_polygons.json".
+  - Validation: 500 from 2018 "cv_polygons.json".
+ 
+- photovoltaic_farms.geojson : PV over Austria "not filtered".
+  
 ## Refernces
 
 - Global Inventory PV datasets : 
