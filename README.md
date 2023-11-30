@@ -1,10 +1,8 @@
-# openEO photovoltaic
+# openEO Platform - Photovoltaic Farms mapping
 
-The aim of this project is mapping PV farms over Europe, using open source data like OSM and Sentinel-2.   
-
+The aim of this project is mapping PV farms over Austria, using open source data like OpenStreetMap (OSM) and Sentinel-2.   
 
 The following notebook "photovoltaic.ipynb" explians how PV farms have been extracted from OSM, then visulize the results.
-
     
 ![photovoltaic_osm](https://github.com/masawdah/openEO_photovoltaic/assets/61426508/a466c81c-1f1b-4a76-b530-7a02ab817b65)
 
@@ -16,7 +14,7 @@ The following notebook "photovoltaic.ipynb" explians how PV farms have been extr
  
 - photovoltaic_farms.geojson : PV over Austria "not filtered".
   
-## Refernces
+## References
 
 - Global Inventory PV datasets : 
   - https://www.nature.com/articles/s41586-021-03957-7
