@@ -20,12 +20,11 @@ big_pv_geoms_buffer = big_pv_geoms_32632_buffer_20.to_crs(4326)
 
 ## Download LCLU Maps
 for i, geom in big_pv_geoms_buffer.iterrows():
-    conn = openeo.connect("openeo.cloud").authenticate_oidc()
     print(i)
     if os.path.exists(f"/mnt/CEPH_PROJECTS/sao/openEO_Platform/lclu/germany/lclu_2021_{i}.nc"):
         print('Already downloaded')
         continue
-    
+    conn = openeo.connect("openeo.cloud").authenticate_oidc()
     aoi = geom["geometry"].bounds
     collection = "ESA_WORLDCOVER_10M_2021_V2"
     
