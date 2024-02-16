@@ -1,4 +1,5 @@
-# gitignore
+models/
+
 __init__.py
 ./.ipynb_checkpoints
 .ipynb_checkpoints
