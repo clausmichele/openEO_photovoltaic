@@ -1,0 +1,730 @@
+{
+  "process_graph": {
+    "textconcat1": {
+      "process_id": "text_concat",
+      "arguments": {
+        "data": [
+          {
+            "from_parameter": "spatial_extend"
+          },
+          "01",
+          "01"
+        ],
+        "separator": "-"
+      }
+    },
+    "textconcat2": {
+      "process_id": "text_concat",
+      "arguments": {
+        "data": [
+          {
+            "from_parameter": "spatial_extend"
+          },
+          "12",
+          "31"
+        ],
+        "separator": "-"
+      }
+    },
+    "loadcollection1": {
+      "process_id": "load_collection",
+      "arguments": {
+        "bands": [
+          "B02",
+          "B03",
+          "B04",
+          "B05",
+          "B06",
+          "B07",
+          "B08",
+          "B8A",
+          "B11",
+          "B12",
+          "SCL"
+        ],
+        "id": "SENTINEL2_L2A",
+        "properties": {
+          "eo:cloud_cover": {
+            "process_graph": {
+              "lte1": {
+                "process_id": "lte",
+                "arguments": {
+                  "x": {
+                    "from_parameter": "value"
+                  },
+                  "y": 65
+                },
+                "result": true
+              }
+            }
+          }
+        },
+        "spatial_extent": {
+          "from_parameter": "year"
+        },
+        "temporal_extent": [
+          {
+            "from_node": "textconcat1"
+          },
+          {
+            "from_node": "textconcat2"
+          }
+        ]
+      }
+    },
+    "maskscldilation1": {
+      "process_id": "mask_scl_dilation",
+      "arguments": {
+        "data": {
+          "from_node": "loadcollection1"
+        },
+        "scl_band_name": "SCL"
+      }
+    },
+    "filterbands1": {
+      "process_id": "filter_bands",
+      "arguments": {
+        "bands": [
+          "B02",
+          "B03",
+          "B04",
+          "B05",
+          "B06",
+          "B07",
+          "B08",
+          "B8A",
+          "B11",
+          "B12"
+        ],
+        "data": {
+          "from_node": "maskscldilation1"
+        }
+      }
+    },
+    "aggregatetemporalperiod1": {
+      "process_id": "aggregate_temporal_period",
+      "arguments": {
+        "data": {
+          "from_node": "filterbands1"
+        },
+        "period": "week",
+        "reducer": {
+          "process_graph": {
+            "mean1": {
+              "process_id": "mean",
+              "arguments": {
+                "data": {
+                  "from_parameter": "data"
+                }
+              },
+              "result": true
+            }
+          }
+        }
+      }
+    },
+    "applydimension1": {
+      "process_id": "apply_dimension",
+      "arguments": {
+        "data": {
+          "from_node": "aggregatetemporalperiod1"
+        },
+        "dimension": "t",
+        "process": {
+          "process_graph": {
+            "arrayinterpolatelinear1": {
+              "process_id": "array_interpolate_linear",
+              "arguments": {
+                "data": {
+                  "from_parameter": "data"
+                }
+              },
+              "result": true
+            }
+          }
+        }
+      }
+    },
+    "textconcat3": {
+      "process_id": "text_concat",
+      "arguments": {
+        "data": [
+          {
+            "from_parameter": "spatial_extend"
+          },
+          "02",
+          "01"
+        ],
+        "separator": "-"
+      }
+    },
+    "textconcat4": {
+      "process_id": "text_concat",
+      "arguments": {
+        "data": [
+          {
+            "from_parameter": "spatial_extend"
+          },
+          "11",
+          "30"
+        ],
+        "separator": "-"
+      }
+    },
+    "filtertemporal1": {
+      "process_id": "filter_temporal",
+      "arguments": {
+        "data": {
+          "from_node": "applydimension1"
+        },
+        "extent": [
+          {
+            "from_node": "textconcat3"
+          },
+          {
+            "from_node": "textconcat4"
+          }
+        ]
+      }
+    },
+    "applydimension2": {
+      "process_id": "apply_dimension",
+      "arguments": {
+        "data": {
+          "from_node": "filtertemporal1"
+        },
+        "dimension": "t",
+        "process": {
+          "process_graph": {
+            "arraycreate1": {
+              "process_id": "array_create",
+              "arguments": {
+                "data": {
+                  "from_parameter": "data"
+                }
+              },
+              "result": true
+            }
+          }
+        },
+        "target_dimension": "bands"
+      }
+    },
+    "renamelabels1": {
+      "process_id": "rename_labels",
+      "arguments": {
+        "data": {
+          "from_node": "applydimension2"
+        },
+        "dimension": "bands",
+        "target": [
+          "B02_t1",
+          "B02_t2",
+          "B02_t3",
+          "B02_t4",
+          "B02_t5",
+          "B02_t6",
+          "B02_t7",
+          "B02_t8",
+          "B02_t9",
+          "B02_t10",
+          "B02_t11",
+          "B02_t12",
+          "B02_t13",
+          "B02_t14",
+          "B02_t15",
+          "B02_t16",
+          "B02_t17",
+          "B02_t18",
+          "B02_t19",
+          "B02_t20",
+          "B02_t21",
+          "B02_t22",
+          "B02_t23",
+          "B02_t24",
+          "B02_t25",
+          "B02_t26",
+          "B02_t27",
+          "B02_t28",
+          "B02_t29",
+          "B02_t30",
+          "B02_t31",
+          "B02_t32",
+          "B02_t33",
+          "B02_t34",
+          "B02_t35",
+          "B02_t36",
+          "B02_t37",
+          "B02_t38",
+          "B02_t39",
+          "B02_t40",
+          "B02_t41",
+          "B02_t42",
+          "B02_t43",
+          "B03_t1",
+          "B03_t2",
+          "B03_t3",
+          "B03_t4",
+          "B03_t5",
+          "B03_t6",
+          "B03_t7",
+          "B03_t8",
+          "B03_t9",
+          "B03_t10",
+          "B03_t11",
+          "B03_t12",
+          "B03_t13",
+          "B03_t14",
+          "B03_t15",
+          "B03_t16",
+          "B03_t17",
+          "B03_t18",
+          "B03_t19",
+          "B03_t20",
+          "B03_t21",
+          "B03_t22",
+          "B03_t23",
+          "B03_t24",
+          "B03_t25",
+          "B03_t26",
+          "B03_t27",
+          "B03_t28",
+          "B03_t29",
+          "B03_t30",
+          "B03_t31",
+          "B03_t32",
+          "B03_t33",
+          "B03_t34",
+          "B03_t35",
+          "B03_t36",
+          "B03_t37",
+          "B03_t38",
+          "B03_t39",
+          "B03_t40",
+          "B03_t41",
+          "B03_t42",
+          "B03_t43",
+          "B04_t1",
+          "B04_t2",
+          "B04_t3",
+          "B04_t4",
+          "B04_t5",
+          "B04_t6",
+          "B04_t7",
+          "B04_t8",
+          "B04_t9",
+          "B04_t10",
+          "B04_t11",
+          "B04_t12",
+          "B04_t13",
+          "B04_t14",
+          "B04_t15",
+          "B04_t16",
+          "B04_t17",
+          "B04_t18",
+          "B04_t19",
+          "B04_t20",
+          "B04_t21",
+          "B04_t22",
+          "B04_t23",
+          "B04_t24",
+          "B04_t25",
+          "B04_t26",
+          "B04_t27",
+          "B04_t28",
+          "B04_t29",
+          "B04_t30",
+          "B04_t31",
+          "B04_t32",
+          "B04_t33",
+          "B04_t34",
+          "B04_t35",
+          "B04_t36",
+          "B04_t37",
+          "B04_t38",
+          "B04_t39",
+          "B04_t40",
+          "B04_t41",
+          "B04_t42",
+          "B04_t43",
+          "B05_t1",
+          "B05_t2",
+          "B05_t3",
+          "B05_t4",
+          "B05_t5",
+          "B05_t6",
+          "B05_t7",
+          "B05_t8",
+          "B05_t9",
+          "B05_t10",
+          "B05_t11",
+          "B05_t12",
+          "B05_t13",
+          "B05_t14",
+          "B05_t15",
+          "B05_t16",
+          "B05_t17",
+          "B05_t18",
+          "B05_t19",
+          "B05_t20",
+          "B05_t21",
+          "B05_t22",
+          "B05_t23",
+          "B05_t24",
+          "B05_t25",
+          "B05_t26",
+          "B05_t27",
+          "B05_t28",
+          "B05_t29",
+          "B05_t30",
+          "B05_t31",
+          "B05_t32",
+          "B05_t33",
+          "B05_t34",
+          "B05_t35",
+          "B05_t36",
+          "B05_t37",
+          "B05_t38",
+          "B05_t39",
+          "B05_t40",
+          "B05_t41",
+          "B05_t42",
+          "B05_t43",
+          "B06_t1",
+          "B06_t2",
+          "B06_t3",
+          "B06_t4",
+          "B06_t5",
+          "B06_t6",
+          "B06_t7",
+          "B06_t8",
+          "B06_t9",
+          "B06_t10",
+          "B06_t11",
+          "B06_t12",
+          "B06_t13",
+          "B06_t14",
+          "B06_t15",
+          "B06_t16",
+          "B06_t17",
+          "B06_t18",
+          "B06_t19",
+          "B06_t20",
+          "B06_t21",
+          "B06_t22",
+          "B06_t23",
+          "B06_t24",
+          "B06_t25",
+          "B06_t26",
+          "B06_t27",
+          "B06_t28",
+          "B06_t29",
+          "B06_t30",
+          "B06_t31",
+          "B06_t32",
+          "B06_t33",
+          "B06_t34",
+          "B06_t35",
+          "B06_t36",
+          "B06_t37",
+          "B06_t38",
+          "B06_t39",
+          "B06_t40",
+          "B06_t41",
+          "B06_t42",
+          "B06_t43",
+          "B07_t1",
+          "B07_t2",
+          "B07_t3",
+          "B07_t4",
+          "B07_t5",
+          "B07_t6",
+          "B07_t7",
+          "B07_t8",
+          "B07_t9",
+          "B07_t10",
+          "B07_t11",
+          "B07_t12",
+          "B07_t13",
+          "B07_t14",
+          "B07_t15",
+          "B07_t16",
+          "B07_t17",
+          "B07_t18",
+          "B07_t19",
+          "B07_t20",
+          "B07_t21",
+          "B07_t22",
+          "B07_t23",
+          "B07_t24",
+          "B07_t25",
+          "B07_t26",
+          "B07_t27",
+          "B07_t28",
+          "B07_t29",
+          "B07_t30",
+          "B07_t31",
+          "B07_t32",
+          "B07_t33",
+          "B07_t34",
+          "B07_t35",
+          "B07_t36",
+          "B07_t37",
+          "B07_t38",
+          "B07_t39",
+          "B07_t40",
+          "B07_t41",
+          "B07_t42",
+          "B07_t43",
+          "B08_t1",
+          "B08_t2",
+          "B08_t3",
+          "B08_t4",
+          "B08_t5",
+          "B08_t6",
+          "B08_t7",
+          "B08_t8",
+          "B08_t9",
+          "B08_t10",
+          "B08_t11",
+          "B08_t12",
+          "B08_t13",
+          "B08_t14",
+          "B08_t15",
+          "B08_t16",
+          "B08_t17",
+          "B08_t18",
+          "B08_t19",
+          "B08_t20",
+          "B08_t21",
+          "B08_t22",
+          "B08_t23",
+          "B08_t24",
+          "B08_t25",
+          "B08_t26",
+          "B08_t27",
+          "B08_t28",
+          "B08_t29",
+          "B08_t30",
+          "B08_t31",
+          "B08_t32",
+          "B08_t33",
+          "B08_t34",
+          "B08_t35",
+          "B08_t36",
+          "B08_t37",
+          "B08_t38",
+          "B08_t39",
+          "B08_t40",
+          "B08_t41",
+          "B08_t42",
+          "B08_t43",
+          "B8A_t1",
+          "B8A_t2",
+          "B8A_t3",
+          "B8A_t4",
+          "B8A_t5",
+          "B8A_t6",
+          "B8A_t7",
+          "B8A_t8",
+          "B8A_t9",
+          "B8A_t10",
+          "B8A_t11",
+          "B8A_t12",
+          "B8A_t13",
+          "B8A_t14",
+          "B8A_t15",
+          "B8A_t16",
+          "B8A_t17",
+          "B8A_t18",
+          "B8A_t19",
+          "B8A_t20",
+          "B8A_t21",
+          "B8A_t22",
+          "B8A_t23",
+          "B8A_t24",
+          "B8A_t25",
+          "B8A_t26",
+          "B8A_t27",
+          "B8A_t28",
+          "B8A_t29",
+          "B8A_t30",
+          "B8A_t31",
+          "B8A_t32",
+          "B8A_t33",
+          "B8A_t34",
+          "B8A_t35",
+          "B8A_t36",
+          "B8A_t37",
+          "B8A_t38",
+          "B8A_t39",
+          "B8A_t40",
+          "B8A_t41",
+          "B8A_t42",
+          "B8A_t43",
+          "B11_t1",
+          "B11_t2",
+          "B11_t3",
+          "B11_t4",
+          "B11_t5",
+          "B11_t6",
+          "B11_t7",
+          "B11_t8",
+          "B11_t9",
+          "B11_t10",
+          "B11_t11",
+          "B11_t12",
+          "B11_t13",
+          "B11_t14",
+          "B11_t15",
+          "B11_t16",
+          "B11_t17",
+          "B11_t18",
+          "B11_t19",
+          "B11_t20",
+          "B11_t21",
+          "B11_t22",
+          "B11_t23",
+          "B11_t24",
+          "B11_t25",
+          "B11_t26",
+          "B11_t27",
+          "B11_t28",
+          "B11_t29",
+          "B11_t30",
+          "B11_t31",
+          "B11_t32",
+          "B11_t33",
+          "B11_t34",
+          "B11_t35",
+          "B11_t36",
+          "B11_t37",
+          "B11_t38",
+          "B11_t39",
+          "B11_t40",
+          "B11_t41",
+          "B11_t42",
+          "B11_t43",
+          "B12_t1",
+          "B12_t2",
+          "B12_t3",
+          "B12_t4",
+          "B12_t5",
+          "B12_t6",
+          "B12_t7",
+          "B12_t8",
+          "B12_t9",
+          "B12_t10",
+          "B12_t11",
+          "B12_t12",
+          "B12_t13",
+          "B12_t14",
+          "B12_t15",
+          "B12_t16",
+          "B12_t17",
+          "B12_t18",
+          "B12_t19",
+          "B12_t20",
+          "B12_t21",
+          "B12_t22",
+          "B12_t23",
+          "B12_t24",
+          "B12_t25",
+          "B12_t26",
+          "B12_t27",
+          "B12_t28",
+          "B12_t29",
+          "B12_t30",
+          "B12_t31",
+          "B12_t32",
+          "B12_t33",
+          "B12_t34",
+          "B12_t35",
+          "B12_t36",
+          "B12_t37",
+          "B12_t38",
+          "B12_t39",
+          "B12_t40",
+          "B12_t41",
+          "B12_t42",
+          "B12_t43"
+        ]
+      }
+    },
+    "reducedimension1": {
+      "process_id": "reduce_dimension",
+      "arguments": {
+        "data": {
+          "from_node": "renamelabels1"
+        },
+        "dimension": "bands",
+        "reducer": {
+          "process_graph": {
+            "runudf1": {
+              "process_id": "run_udf",
+              "arguments": {
+                "context": {
+                  "model_url": {
+                    "from_parameter": "inference_url"
+                  }
+                },
+                "data": {
+                  "from_parameter": "data"
+                },
+                "runtime": "Python",
+                "udf": "import sys\nfrom typing import Dict\nimport xarray as xr\nfrom openeo.udf import inspect\nimport requests\nimport numpy as np\nimport functools\n\n# Import the onnxruntime package from the onnx_deps directory\nsys.path.insert(0, \"onnx_deps\")\nimport onnxruntime as ort\n\n\n@functools.lru_cache(maxsize=6)\ndef _load_ort_session(model_url: str):\n    \"\"\"\n    Load the models and make the prediction functions.\n    The lru_cache avoids loading the model multiple times on the same worker.\n    \"\"\"\n    inspect(message=f\"Loading random forrest as ONNX runtime session ...\")\n    response = requests.get(model_url)\n    model = response.content\n    inspect(message=f\"Model loaded from {model_url}\", level=\"debug\")\n    return ort.InferenceSession(model)\n\ndef _apply_ml(input_data : np.ndarray, session: ort.InferenceSession) -> np.ndarray:\n    \"\"\"\n    Apply the model to a tensor containing features.\n    \"\"\"\n    return session.run(None, {'input': input_data})[0]\n    \n\ndef apply_datacube(cube: xr.DataArray, context: Dict) -> xr.DataArray:\n    \"\"\"\n    Apply the model to the datacube.\n    \"\"\"\n    # Load the model\n    session = _load_ort_session(context.get(\"model_url\", None))\n\n    # Prepare the input\n    cube = cube.values.astype(np.float32)\n    input_data = np.nan_to_num(cube, nan=-999999)\n    \n    #reshape to desired format (X * (bands*time) = X*430)\n    input_data = input_data.reshape((input_data.shape[0], -1)).T\n\n\n    # Make the prediction\n    output = _apply_ml(input_data, session)\n    # Prepare the output\n    output = output.reshape(cube.shape[1:])\n    return xr.DataArray(output)\n\n"
+              },
+              "result": true
+            }
+          }
+        }
+      },
+      "result": true
+    }
+  },
+  "id": "pv_inference",
+  "parameters": [
+    {
+      "name": "year",
+      "description": "The year for which to generate an annual mean composite.",
+      "schema": {
+        "type": "integer"
+      },
+      "default": 2021,
+      "optional": true
+    },
+    {
+      "name": "spatial_extend",
+      "description": "The bounding box to load.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "west": {
+            "type": "number"
+          },
+          "south": {
+            "type": "number"
+          },
+          "east": {
+            "type": "number"
+          },
+          "north": {
+            "type": "number"
+          },
+          "crs": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "inference_url",
+      "description": "url to the inference network, must be on VITO artifactory",
+      "schema": {
+        "type": "string"
+      },
+      "default": "https://artifactory.vgt.vito.be/artifactory/auxdata-public/photovoltaic/random_forest.onnx",
+      "optional": true
+    }
+  ]
+}
