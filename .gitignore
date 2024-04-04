@@ -2,6 +2,8 @@
 __init__.py
 ./.ipynb_checkpoints
 .ipynb_checkpoints
+.nc
+.json
 __pycache__/
 
 
