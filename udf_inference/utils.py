@@ -113,3 +113,29 @@ def convert_sklearn_to_onnx(model_url: str, input_shape: tuple) -> None:
     # Save the ONNX model to a file
     onnxmltools.utils.save_model(onnx_model, "random_forest.onnx")
 
+
+def convert_local_sklearn_to_onnx(model_url: str, input_shape: tuple, output_filename: str) -> None:
+    """
+    Convert a scikit-learn model to ONNX format and save it to the specified output folder.
+
+    Parameters:
+        model_url (str): The path from which to load the scikit-learn model.
+        output_folder (str): The folder path where the ONNX model will be saved.
+        input_shape (tuple): The shape of the input data expected by the model.
+
+    Returns:
+        None
+    """
+    # Load the model from the given path
+    with open(model_url,"rb") as f:
+        random_forest_model = pickle.load(f)
+
+    # Construct the initial_types argument using FloatTensorType
+    input_name = 'input'
+    initial_types = [(input_name, FloatTensorType(input_shape))]
+
+    # Convert the model to ONNX
+    onnx_model = onnxmltools.convert_sklearn(random_forest_model, initial_types=initial_types)
+
+    # Save the ONNX model to a file
+    onnxmltools.utils.save_model(onnx_model, output_filename)

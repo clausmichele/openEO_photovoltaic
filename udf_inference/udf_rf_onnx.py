@@ -41,7 +41,7 @@ def apply_datacube(cube: xr.DataArray, context: Dict) -> xr.DataArray:
     cube = cube.values.astype(np.float32)
     input_data = np.nan_to_num(cube, nan=-999999)
     
-    #reshape to desired format (X * (bands*time) = X*430)
+    #reshape to desired format
     input_data = input_data.reshape((input_data.shape[0], -1)).T
 
 
