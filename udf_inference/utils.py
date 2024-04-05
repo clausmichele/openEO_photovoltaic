@@ -6,85 +6,72 @@ from skl2onnx.common.data_types import FloatTensorType
 import openeo.processes as eop
 import openeo
 from openeo.processes import text_concat
+import numpy as np
 
-
-def preprocess_sentinel2_data(conn: openeo.Connection, spatial_extent: dict, year:int) -> openeo.DataCube:
+def preprocess_sentinel2_data(conn: openeo.Connection, spatial_extent: dict, temporal_extend:list) -> openeo.DataCube:
     """
     Preprocess Sentinel-2 Level-2A data cube.
     - cloud masking
     - aggregate to weekly data
     - interpolate the missing data
-    - remove December-January
-    - transform from bands, x, y, time to x, y, bands*time
+    - median filter time
 
     Args:
         conn: openEO connection object.
-        year_param (str): Year for which data is to be loaded.
+        temporal_extend (list): temporal extend.
         spatial_extent_param (dict): Spatial extent for data loading.
 
     Returns:
         openEO data cube: Preprocessed Sentinel-2 data cube.
     """
 
-    # Load Sentinel-2 Level-2A data cube
-    start_day = text_concat([year, "01", "01"], separator="-")
-    end_day = text_concat([year, "12", "31"], separator="-")
-
     s2_cube = conn.load_collection(
         collection_id="SENTINEL2_L2A",
         spatial_extent=spatial_extent,
-        temporal_extent=[start_day, end_day],
+        temporal_extent=temporal_extend,
         bands=["B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B11", "B12", "SCL"],
         properties={"eo:cloud_cover": lambda x: x.lte(65)}
     )
 
-    # Mask data of clouded areas
+    # Create weekly composites by taking the mean
     s2_cube = s2_cube.process("mask_scl_dilation", data=s2_cube, scl_band_name="SCL").filter_bands(s2_cube.metadata.band_names[:-1])
 
     # Create weekly composites by taking the mean
     s2_cube = s2_cube.aggregate_temporal_period(
-        period="week",
-        reducer="mean"
+        period = "week",
+        reducer = "mean"
     )
 
     # Fill gaps in the data using linear interpolation
     s2_cube = s2_cube.apply_dimension(
-        dimension="t",
-        process="array_interpolate_linear"
+        dimension = "t",
+        process = "array_interpolate_linear"
     )
 
-    # Filter out January and December data to ensure 43 weeks of data
-    feb_day = text_concat([year, "02", "01"], separator="-")
-    nov_day = text_concat([year, "11", "30"], separator="-")
-    s2_cube = s2_cube.filter_temporal([feb_day, nov_day])
-
-    # Rearrange cube from (time, x, y, bands) to (x, y, time*bands)
-    s2_cube = timesteps_as_bands(s2_cube, 43)
+    s2_cube = s2_cube.reduce_dimension(dimension="t",reducer="median")
 
     return s2_cube
 
-def timesteps_as_bands(cube: openeo.DataCube, n_times:int) -> openeo.DataCube:
-
+def postprocess_inference_data(input_cube: openeo.DataCube, kernel_size:int) -> openeo.DataCube:
     """
-    Transforms the time dimension of a multi-temporal data cube into a multi-band data cube,
-    where each band represents a time step.
+    Apply post-processing operations on inference data represented by a DataCube.
 
     Parameters:
-    - cube (openeo.DataCube): The input multi-temporal data cube.
-    - n_times (int): The number of time steps to consider.
+        input_cube (openeo.DataCube): The input data cube representing the inference data.
+        kernel_size (int): The size of the kernel for erosion and dilation operations.
 
     Returns:
-    - openeo.DataCube: A new data cube with time steps transformed into bands.
-
+        openeo.DataCube: The post-processed inference data cube.
     """
 
-    band_names = [band + "_t" + str(i+1) for band in cube.metadata.band_names for i in range(n_times)]
-    result =  cube.apply_dimension(
-        dimension='t', 
-        target_dimension='bands', 
-        process=lambda d: eop.array_create(data=d)
-    )
-    return result.rename_labels('bands', band_names)
+
+    kernel = np.ones((kernel_size,kernel_size))
+    factor = 1./np.prod(np.shape(kernel))
+
+    eroded_cube = (input_cube.apply_kernel(kernel=kernel,factor=factor) >= 1) * 1.0
+    dilated_cube = (eroded_cube.apply_kernel(kernel=kernel,factor=factor) > 0) * 1.0
+
+    return dilated_cube
 
 
 def convert_sklearn_to_onnx(model_url: str, input_shape: tuple) -> None:
