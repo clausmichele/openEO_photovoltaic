@@ -10,6 +10,9 @@ Open-source data is used to construct the training dataset, leveraging OpenStree
 
 How to cite: Alasawedah, M., Claus, M., Jacob, A., Griffiths, P., Dries, J., and Lippens, S.: Photovoltaic Farms Mapping using openEO Platform, EGU General Assembly 2024, Vienna, Austria, 14–19 Apr 2024, EGU24-16841, https://doi.org/10.5194/egusphere-egu24-16841, 2024.
 
+![image](https://github.com/masawdah/openEO_photovoltaic/assets/31700619/47f7539d-6442-4f05-81c5-3db5ef022127)
+
+
 ## Usage
 
 You can directly play with the model using openEO Platform or Copernicus Data Space Ecosystem (CDSE) via openEO using this notebook: `./udf_inference/openeo_pv_farms_inference_udf.ipynb`
