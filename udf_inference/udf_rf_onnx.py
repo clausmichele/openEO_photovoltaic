@@ -5,30 +5,81 @@ from openeo.udf import inspect
 import requests
 import numpy as np
 import functools
+import urllib
+import shutil
+import numpy as np
+import os
+from pathlib import Path
 
-# Import the onnxruntime package from the onnx_deps directory
-sys.path.insert(0, "onnx_deps")
-import onnxruntime as ort
-
+SessionType = type(None)
 
 @functools.lru_cache(maxsize=6)
-def _load_ort_session(model_url: str):
+def extract_ort(modeldir: str, modeltag: str):
+    modelfile = str(modeldir) + '/' + modeltag
+    extract_dir = Path.cwd() / 'dependencies'
+    extract_dir.mkdir(exist_ok=True, parents=True)
+
+    modelfile, _ = urllib.request.urlretrieve(
+        modelfile, filename=extract_dir / Path(modelfile).name)
+
+    shutil.unpack_archive(modelfile,
+                          extract_dir=extract_dir)
+
+    sys.path.append(str(extract_dir))
+
+    # Import onnxruntime here as well
+    import onnxruntime as ort
+    return ort 
+    
+      
+
+def _load_ort_session(model_url: str) -> SessionType:
     """
-    Load the models and make the prediction functions.
-    The lru_cache avoids loading the model multiple times on the same worker.
+    Load the ONNX runtime session for the given model URL, ensuring required dependencies are available.
+
+    Parameters:
+    - model_url (str): The URL of the model to load.
+    - dependency_url (str): The URL of the dependency required by the model.
+    - extract_dir (str): The directory to extract the dependency into.
+
+    Returns:
+    - ort.InferenceSession: The ONNX runtime session loaded with the model.
     """
+    # Download and extract the required dependency
+    dependency_url = "https://artifactory.vgt.vito.be/artifactory/auxdata-public/openeo"
+    extract_name = "onnx_dependencies_1.16.3.zip"
+
+    inspect(message=f"Including Dependency ONNX Inference")
+    ort = extract_ort(dependency_url, extract_name)
+
+    # Adapt Sessiontype
+    global SessionType
+    SessionType = ort.InferenceSession
+    inspect(message=f"Dependencies loaded from {dependency_url}", level="debug")
+
+    # Load the model
     inspect(message=f"Loading random forrest as ONNX runtime session ...")
     response = requests.get(model_url)
     model = response.content
     inspect(message=f"Model loaded from {model_url}", level="debug")
-    return ort.InferenceSession(model)
 
-def _apply_ml(input_data : np.ndarray, session: ort.InferenceSession) -> np.ndarray:
+    # Load the dependency into an InferenceSession
+    session = ort.InferenceSession(model)
+
+    # Return the ONNX runtime session loaded with the model
+    return session
+
+
+
+def _apply_ml(input_data: np.ndarray, session: SessionType) -> np.ndarray:
     """
     Apply the model to a tensor containing features.
     """
+    if session is None:
+        # Handle the case when session is not yet assigned
+        raise ValueError("Inference session is not initialized yet.")
     return session.run(None, {'input': input_data})[0]
-    
+
 
 def apply_datacube(cube: xr.DataArray, context: Dict) -> xr.DataArray:
     """
