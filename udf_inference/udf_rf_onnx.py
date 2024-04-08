@@ -14,8 +14,25 @@ from pathlib import Path
 SessionType = type(None)
 
 @functools.lru_cache(maxsize=6)
-def extract_ort(modeldir: str, modeltag: str):
-    modelfile = str(modeldir) + '/' + modeltag
+def extract_ort(dependency_dir: str, dependency_name: str):
+
+    """
+    Extracts the ONNX Runtime (ORT) model from the specified directory.
+
+    Parameters:
+        dependency_dir (str): The directory where the ONNX dependency is located.
+        dependency_name (str): The tag or identifier of the ONNX model.
+
+    Returns:
+        onnxruntime.InferenceSession: An InferenceSession object representing the extracted model.
+
+    Note:
+        This function retrieves the ONNX model specified by `modeltag` from the `modeldir`.
+        It then unpacks the model file and imports ONNX Runtime to enable inference.
+        The extracted model is returned as an InferenceSession object.
+    """
+
+    modelfile = str(dependency_dir) + '/' + dependency_name
     extract_dir = Path.cwd() / 'dependencies'
     extract_dir.mkdir(exist_ok=True, parents=True)
 
@@ -47,10 +64,10 @@ def _load_ort_session(model_url: str) -> SessionType:
     """
     # Download and extract the required dependency
     dependency_url = "https://artifactory.vgt.vito.be/artifactory/auxdata-public/openeo"
-    extract_name = "onnx_dependencies_1.16.3.zip"
+    dependency_name = "onnx_dependencies_1.16.3.zip"
 
     inspect(message=f"Including Dependency ONNX Inference")
-    ort = extract_ort(dependency_url, extract_name)
+    ort = extract_ort(dependency_url, dependency_name)
 
     # Adapt Sessiontype
     global SessionType
