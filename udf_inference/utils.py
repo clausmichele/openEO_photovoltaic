@@ -1,8 +1,6 @@
 
 import urllib.request
 import pickle
-import onnxmltools
-from skl2onnx.common.data_types import FloatTensorType
 import openeo.processes as eop
 import openeo
 from openeo.processes import text_concat
@@ -75,6 +73,8 @@ def postprocess_inference_data(input_cube: openeo.DataCube, kernel_size:int) -> 
 
 
 def convert_sklearn_to_onnx(model_url: str, input_shape: tuple) -> None:
+    import onnxmltools
+    from skl2onnx.common.data_types import FloatTensorType
     """
     Convert a scikit-learn model to ONNX format and save it to the specified output folder.
 
@@ -102,6 +102,8 @@ def convert_sklearn_to_onnx(model_url: str, input_shape: tuple) -> None:
 
 
 def convert_local_sklearn_to_onnx(model_url: str, input_shape: tuple, output_filename: str) -> None:
+    import onnxmltools
+    from skl2onnx.common.data_types import FloatTensorType
     """
     Convert a scikit-learn model to ONNX format and save it to the specified output folder.
 
