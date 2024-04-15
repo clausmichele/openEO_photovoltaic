@@ -12,6 +12,12 @@ How to cite: Alasawedah, M., Claus, M., Jacob, A., Griffiths, P., Dries, J., and
 
 ![image](https://github.com/masawdah/openEO_photovoltaic/assets/31700619/47f7539d-6442-4f05-81c5-3db5ef022127)
 
+## Video Tutorial
+
+
+https://github.com/clausmichele/openEO_photovoltaic/assets/31700619/7e312255-2c5b-4894-b913-b536be5ba564
+
+
 
 ## Usage
 
